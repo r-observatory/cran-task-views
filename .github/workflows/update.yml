@@ -1,8 +1,12 @@
 name: Update CRAN Task Views
 
 on:
-  schedule:
-    - cron: "0 6 * * *"
+  # The scheduled trigger is disabled until default_io() in scripts/update.R
+  # is finalized (it is currently all "FINALIZE" stubs, so a scheduled run
+  # would fail every time). Re-enable by uncommenting the lines below once
+  # the real fetchers are in place.
+  # schedule:
+  #   - cron: "0 6 * * *"
   workflow_dispatch:
     inputs:
       bootstrap:

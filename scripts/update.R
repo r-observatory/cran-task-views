@@ -67,10 +67,12 @@ run_update <- function(io, out_dir, force_full = FALSE) {
 #     archived-but-listed packages, carrying CRAN active/archived status as a
 #     SEPARATE flag (never as membership) so a CRAN archival does not emit a
 #     spurious "removed".
-#   * The forward path (snapshot current membership, diff against the prior
-#     published DB, seed the first forward baseline from the backfill's final
-#     membership) is folded in here at build time; verify no phantom events on
-#     the first forward run.
+#   * run_update() always performs a full deterministic replay: for every view
+#     it walks the complete revision list from view_repo_revisions and rebuilds
+#     the event log and membership table from scratch. It never reads or diffs
+#     against a previously published DB, so default_io's fetchers must return
+#     each view's full revision history on every run; there is no incremental
+#     or forward-only path to seed here.
 # ---------------------------------------------------------------------------
 default_io <- function() {
   list(

@@ -19,8 +19,6 @@ jobs:
           packages: |
             any::RSQLite
             any::DBI
-            any::ctv
             any::testthat
-            any::withr
       - name: Run unit tests
         run: Rscript tests/testthat.R

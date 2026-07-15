@@ -34,7 +34,7 @@ CRAN.
 ## Running
 
 ```sh
-Rscript scripts/update.R out/            # incremental (change-gated)
+Rscript scripts/update.R out/            # full rebuild, replays all revisions
 Rscript scripts/update.R out/ --bootstrap  # full rebuild
 Rscript tests/testthat.R                 # unit tests
 ```
