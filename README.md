@@ -5,12 +5,14 @@ belong to which task view, when they were added or removed, and whether they
 are listed as core. CRAN task views themselves only reflect current
 membership, so this fills that gap by replaying each view's edit history.
 
-It reads the CTV allowlist from `ctv::available.views()` (the `ctv` toolkit
-package itself is excluded, since it is not a task view) and, for each view,
-walks the git history of its markdown source, rendering every revision
-through the `ctv` reader to get a package-to-core snapshot. Snapshots are
-diffed pairwise into an append-only event log, which is then replayed into a
-current membership table. The aggregated data is written to a SQLite
+It enumerates the task-view repositories under the `cran-task-views` GitHub
+org (the `ctv` toolkit repo itself is excluded, since it is not a task view)
+and, for each view, walks the git history of its markdown source, parsing the
+inline `r pkg(...)` code spans at every revision to get a package-to-core
+snapshot. Snapshots are diffed pairwise into an append-only event log, which
+is then replayed into a current membership table. The pipeline is
+dependency-light: it uses `git` and `gh` plus base-R string parsing, with no
+`ctv`/knitr/pandoc toolchain. The aggregated data is written to a SQLite
 database and published to the `r-observatory/cran-task-views` GitHub
 repository for downstream consumers.
 

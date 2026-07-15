@@ -2,7 +2,7 @@
 # scripts/update.R: CRAN Task Views membership catalog builder.
 #
 # run_update(io, out_dir, force_full) takes an injectable io for offline testing;
-# default_io() supplies the real ctv-reader + git fetchers (marked FINALIZE below).
+# default_io() supplies the real git + markdown-parser fetchers (see below).
 options(timeout = 600)
 suppressPackageStartupMessages({ library(RSQLite) })
 
@@ -18,6 +18,9 @@ suppressPackageStartupMessages({ library(RSQLite) })
 if (!exists("export_task_views", mode = "function")) {
   source(file.path(.script_dir, "config.R"))
   source(file.path(.script_dir, "helpers.R"))
+}
+if (!exists("parse_ctv_membership", mode = "function")) {
+  source(file.path(.script_dir, "ctv_md.R"))
 }
 
 run_update <- function(io, out_dir, force_full = FALSE) {
@@ -58,28 +61,95 @@ run_update <- function(io, out_dir, force_full = FALSE) {
 }
 
 # ---------------------------------------------------------------------------
-# default_io(): real fetchers. FINALIZE-AT-BUILD-TIME. These cannot be
-# exercised offline in this plan and MUST be completed against the real `ctv`
-# package and a local git clone of each view repo:
-#   * read_ctv_at MUST route through ctv::read.ctv() (which applies the upstream
-#     "core if any mention is core" rule, ctv-md.R:67-71) rather than re-parsing
-#     pkg() tokens by hand, and MUST use `packagelist` UNION the view's
-#     archived-but-listed packages, carrying CRAN active/archived status as a
-#     SEPARATE flag (never as membership) so a CRAN archival does not emit a
-#     spurious "removed".
+# default_io(): the real, side-effecting fetchers. These are deliberately
+# dependency-light: they shell out to `git` and `gh` and parse each view's
+# markdown source directly (scripts/ctv_md.R), with no `ctv`/knitr/pandoc
+# toolchain. Each task view is its own public repo under the cran-task-views
+# org, holding a single `<View>.md` source; membership is read from the inline
+# `r pkg(...)` code spans in that file.
+#
 #   * run_update() always performs a full deterministic replay: for every view
 #     it walks the complete revision list from view_repo_revisions and rebuilds
 #     the event log and membership table from scratch. It never reads or diffs
-#     against a previously published DB, so default_io's fetchers must return
-#     each view's full revision history on every run; there is no incremental
-#     or forward-only path to seed here.
+#     against a previously published DB, so these fetchers return each view's
+#     full revision history on every run; there is no incremental path to seed.
+#   * The revision walk covers the GitHub markdown era (~2021-12 onward), which
+#     is the intended tracking window; the pre-migration XML `.ctv` history that
+#     predates the markdown source is out of scope.
+#   * A CRAN archival never touches a view's `.md`, so a package that goes
+#     archived but stays listed produces an unchanged snapshot and no spurious
+#     "removed" event, without needing a separate active/archived flag here.
+#
+# The four closures share a single per-run clone cache via lexical scope, so
+# each view repo is cloned at most once per run.
 # ---------------------------------------------------------------------------
 default_io <- function() {
+  cache <- file.path(tempdir(), paste0("ctv-clones-", Sys.getpid()))
+  dir.create(cache, showWarnings = FALSE, recursive = TRUE)
+
+  ensure_clone <- function(v) {
+    dest <- file.path(cache, v)
+    if (!dir.exists(file.path(dest, ".git"))) {
+      url <- sprintf("https://github.com/cran-task-views/%s.git", v)
+      status <- system2("git", c("clone", "--quiet", "--no-tags",
+                                 shQuote(url), shQuote(dest)),
+                        stdout = FALSE, stderr = FALSE)
+      if (!identical(as.integer(status), 0L)) {
+        stop(sprintf("git clone failed for view '%s' (exit %s)", v, status))
+      }
+    }
+    dest
+  }
+  git_show <- function(dest, ref) {
+    system2("git", c("-C", shQuote(dest), "show", shQuote(ref)),
+            stdout = TRUE, stderr = FALSE)
+  }
+
   list(
-    available_views     = function() ctv::available.views()$name,        # FINALIZE
-    view_repo_revisions = function(v) stop("FINALIZE: git log of the ", v, " view repo"),
-    read_ctv_at         = function(v, sha) stop("FINALIZE: ctv::read.ctv at revision ", sha),
-    view_info           = function(v) stop("FINALIZE: ctv view metadata for ", v)
+    # Enumerate the view repos under the org (gh is authed; --paginate handles
+    # the full listing). `ctv` and any non-view infra repo are dropped upstream
+    # by run_update via CTV_EXCLUDE and by an empty revision list respectively.
+    available_views = function() {
+      out <- system2("gh", c("api", "--paginate", "orgs/cran-task-views/repos",
+                             "--jq", shQuote(".[].name")),
+                     stdout = TRUE, stderr = FALSE)
+      out <- trimws(out)
+      out[nzchar(out)]
+    },
+    # Oldest-first revisions that changed `<View>.md`. `date` is the committer
+    # date in YYYY-MM-DD form (%cs), a lexicographically sortable text key.
+    view_repo_revisions = function(v) {
+      dest <- ensure_clone(v)
+      log <- system2("git", c("-C", shQuote(dest), "log", "--reverse",
+                              shQuote("--format=%H|%cs"), "--",
+                              shQuote(paste0(v, ".md"))),
+                     stdout = TRUE, stderr = FALSE)
+      log <- log[nzchar(log)]
+      if (length(log) == 0L) return(NULL)
+      parts <- strsplit(log, "|", fixed = TRUE)
+      data.frame(
+        sha  = vapply(parts, function(p) p[[1]], character(1)),
+        date = vapply(parts, function(p) substr(p[[2]], 1L, 10L), character(1)),
+        stringsAsFactors = FALSE)
+    },
+    # Membership snapshot at a revision: named integer vector package -> core.
+    read_ctv_at = function(v, sha) {
+      dest <- ensure_clone(v)
+      txt <- git_show(dest, paste0(sha, ":", v, ".md"))
+      if (length(txt) == 0L) return(integer(0))
+      parse_ctv_membership(paste(txt, collapse = "\n"))
+    },
+    # HEAD metadata parsed from the `<View>.md` YAML header.
+    view_info = function(v) {
+      dest <- ensure_clone(v)
+      txt <- git_show(dest, paste0("HEAD:", v, ".md"))
+      if (length(txt) == 0L) {
+        return(list(topic = NA_character_, maintainer = NA_character_,
+                    url = sprintf("https://github.com/cran-task-views/%s/", v),
+                    updated = NA_character_))
+      }
+      parse_ctv_header(paste(txt, collapse = "\n"), view = v)
+    }
   )
 }
 

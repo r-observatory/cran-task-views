@@ -1,10 +1,8 @@
 name: Update CRAN Task Views
 
 on:
-  # The scheduled trigger is disabled until default_io() in scripts/update.R
-  # is finalized (it is currently all "FINALIZE" stubs, so a scheduled run
-  # would fail every time). Re-enable by uncommenting the lines below once
-  # the real fetchers are in place.
+  # The scheduled trigger is intentionally disabled here; it is re-enabled
+  # separately. Uncomment the lines below to turn on the daily run.
   # schedule:
   #   - cron: "0 6 * * *"
   workflow_dispatch:
@@ -36,7 +34,7 @@ jobs:
           packages: |
             any::RSQLite
             any::DBI
-            any::ctv
+            any::jsonlite
             any::testthat
             any::withr
       - name: Run unit tests
@@ -60,6 +58,6 @@ jobs:
             git tag -f current
             git push -f origin current || true
             gh release create current --title "CRAN Task Views (rolling)" \
-              --notes "CRAN task-view membership over time, rendered through the ctv reader." --latest
+              --notes "CRAN task-view membership over time, replayed from each view's git history." --latest
           fi
           gh release upload current out/cran-task-views.db --clobber
