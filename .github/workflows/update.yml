@@ -1,10 +1,8 @@
 name: Update CRAN Task Views
 
 on:
-  # The scheduled trigger is intentionally disabled here; it is re-enabled
-  # separately. Uncomment the lines below to turn on the daily run.
-  # schedule:
-  #   - cron: "0 6 * * *"
+  schedule:
+    - cron: "0 6 * * *"
   workflow_dispatch:
     inputs:
       bootstrap:
