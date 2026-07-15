@@ -1,0 +1,61 @@
+name: Update CRAN Task Views
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+    inputs:
+      bootstrap:
+        description: "Rebuild from scratch."
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cran-task-views-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "release"
+          use-public-rspm: true
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::RSQLite
+            any::DBI
+            any::ctv
+            any::testthat
+            any::withr
+      - name: Run unit tests
+        run: Rscript tests/testthat.R
+      - name: Build task-view database
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p out
+          if [ "${{ inputs.bootstrap }}" = "true" ]; then
+            Rscript scripts/update.R out/ --bootstrap
+          else
+            Rscript scripts/update.R out/
+          fi
+      - name: Publish to the "current" release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if ! gh release view current >/dev/null 2>&1; then
+            git tag -f current
+            git push -f origin current || true
+            gh release create current --title "CRAN Task Views (rolling)" \
+              --notes "CRAN task-view membership over time, rendered through the ctv reader." --latest
+          fi
+          gh release upload current out/cran-task-views.db --clobber
