@@ -83,10 +83,16 @@ derive_membership_from_events <- function(events_df) {
                       removed_date = character(0), currently_member = integer(0), core = integer(0),
                       stringsAsFactors = FALSE)
   if (nrow(events_df) == 0L) return(empty)
+  # Emission order is the true chronological mainline order: revisions are walked
+  # oldest-first and their events are appended in order, so row order already
+  # encodes commit order. Carry it as a per-event sequence index and replay each
+  # package's events in that order. Sorting on the sequence (not a fixed
+  # added<core_change<removed type rank) is what lets a same-day remove-then-readd
+  # resolve to member instead of the removed always folding last. The .seq column
+  # is internal and never reaches the exported schema.
+  events_df$.seq <- seq_len(nrow(events_df))
   key <- paste(events_df$view, events_df$package, sep = "\r")
-  # Stable replay order: by date, then added before core_change before removed on a shared date.
-  type_rank <- match(events_df$event_type, c("added", "core_change", "removed"))
-  ord <- order(key, events_df$event_date, type_rank)
+  ord <- order(key, events_df$.seq)
   events_df <- events_df[ord, , drop = FALSE]; key <- key[ord]
   rows <- list()
   for (k in unique(key)) {

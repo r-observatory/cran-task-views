@@ -86,6 +86,40 @@ test_that("a body with no pkg() calls yields integer(0)", {
   expect_length(parse_ctv_membership(txt), 0L)
 })
 
+test_that("a delimiter-less pkg() in prose is not counted as a member", {
+  # When the maintainer drops the `r ... ` inline-span delimiters, the text
+  # renders literally on CRAN and the package is NOT a member. Only the properly
+  # delimited span counts.
+  txt <- paste(
+    "---", "name: Demo", "---", "",
+    'A stray pkg("phantom") in prose without the span delimiters, plus a',
+    'malformed r pkg("alsophantom") with no backticks, must be ignored;',
+    'only `r pkg("real")` is a member.',
+    sep = "\n")
+  m <- parse_ctv_membership(txt)
+  expect_equal(names(m), "real")
+  expect_false("phantom" %in% names(m))
+  expect_false("alsophantom" %in% names(m))
+})
+
+test_that("a pkg() inside a fenced ```r block is not counted as a member", {
+  # A fenced code block is example code, not membership; its pkg() calls span
+  # multiple lines and never sit inside a single-line inline span.
+  txt <- paste(
+    "---", "name: Demo", "---", "",
+    "An example of the helper:",
+    "```r",
+    'pkg("fenced")',
+    'pkg("alsofenced", priority = "core")',
+    "```",
+    'while `r pkg("real")` is the only member.',
+    sep = "\n")
+  m <- parse_ctv_membership(txt)
+  expect_equal(names(m), "real")
+  expect_false("fenced" %in% names(m))
+  expect_false("alsofenced" %in% names(m))
+})
+
 test_that("parse_ctv_header extracts topic, maintainer, url, and updated", {
   txt <- paste(
     "---",

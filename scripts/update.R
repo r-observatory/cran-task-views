@@ -116,11 +116,18 @@ default_io <- function() {
       out <- trimws(out)
       out[nzchar(out)]
     },
-    # Oldest-first revisions that changed `<View>.md`. `date` is the committer
-    # date in YYYY-MM-DD form (%cs), a lexicographically sortable text key.
+    # Oldest-first revisions that changed `<View>.md` along the mainline. We walk
+    # with --first-parent so each merge is a single main-before -> main-after
+    # transition and the branch-internal file state is never revisited; without
+    # it, `git log` returns topological (not chronological) order and a merge of
+    # an older branch tree emits a spurious removed+added pair dated the merge
+    # day. --first-parent applies the pathspec filter along the first-parent
+    # chain, so the `-- <View>.md` filter still selects only revisions that
+    # changed the file. `date` is the committer date in YYYY-MM-DD form (%cs), a
+    # lexicographically sortable text key.
     view_repo_revisions = function(v) {
       dest <- ensure_clone(v)
-      log <- system2("git", c("-C", shQuote(dest), "log", "--reverse",
+      log <- system2("git", c("-C", shQuote(dest), "log", "--first-parent", "--reverse",
                               shQuote("--format=%H|%cs"), "--",
                               shQuote(paste0(v, ".md"))),
                      stdout = TRUE, stderr = FALSE)

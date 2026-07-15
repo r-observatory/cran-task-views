@@ -40,12 +40,21 @@
 parse_ctv_membership <- function(text) {
   body <- .ctv_split_frontmatter(text)$body
   if (!nzchar(trimws(body))) return(integer(0))
-  # Match pkg( ... ) calls only. The lookbehind rejects a word/dot before "pkg"
-  # so mypkg(...) and other.pkg(...) do not match, and sibling helpers such as
-  # bioc()/github()/view() never contain the token "pkg". Package arguments hold
-  # no nested parentheses, so [^()]* captures a whole call.
-  calls <- regmatches(body,
-    gregexpr("(?<![A-Za-z0-9._])pkg\\s*\\(([^()]*)\\)", body, perl = TRUE))[[1]]
+  # Membership is expressed ONLY inside a single-line inline R code span:
+  # a backtick, `r`, a horizontal whitespace, code with no backtick or newline,
+  # then a closing backtick, e.g. `r pkg("Name")`. Extract those spans first.
+  # A delimiter-less pkg("X") dropped into prose renders literally on CRAN (not a
+  # member), and a fenced ```r block spans multiple lines; requiring the closing
+  # backtick with no interior backtick/newline excludes both.
+  spans <- regmatches(body,
+    gregexpr("`r[ \\t][^`\\n]*`", body, perl = TRUE))[[1]]
+  if (length(spans) == 0L) return(integer(0))
+  # Within each inline span, match pkg( ... ) calls only. The lookbehind rejects
+  # a word/dot before "pkg" so mypkg(...) and other.pkg(...) do not match, and
+  # sibling helpers such as bioc()/github()/view() never contain the token "pkg".
+  # Package arguments hold no nested parentheses, so [^()]* captures a whole call.
+  calls <- unlist(regmatches(spans,
+    gregexpr("(?<![A-Za-z0-9._])pkg\\s*\\(([^()]*)\\)", spans, perl = TRUE)))
   if (length(calls) == 0L) return(integer(0))
 
   names_vec <- character(0)
