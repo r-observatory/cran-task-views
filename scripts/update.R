@@ -56,7 +56,20 @@ run_update <- function(io, out_dir, force_full = FALSE) {
     data.frame(name=character(0), topic=character(0), maintainer=character(0),
                url=character(0), updated=character(0), stringsAsFactors = FALSE)
 
-  export_task_views(file.path(out_dir, DB_FILENAME), views_df, events_df, membership_df)
+  db_path <- file.path(out_dir, DB_FILENAME)
+  export_task_views(db_path, views_df, events_df, membership_df)
+
+  # The DB file is finalized and its connection closed inside export_task_views
+  # (on.exit dbDisconnect), so summary_integrity_core hashes the exact on-disk
+  # bytes with no open handle or journal skewing the size/sha256.
+  # complete = TRUE: run_update always performs a FULL deterministic replay of
+  # every available view's entire revision history (full-not-partial). It aborts
+  # via the VIEWS_FLOOR gate rather than publish a truncated catalog, so there is
+  # no partial/bootstrap state to derive from. Freshness is tracked separately
+  # via manifest generated_at and the db_sha256 fingerprint.
+  core <- summary_integrity_core(db_path, complete = TRUE)
+  write_manifest(file.path(out_dir, MANIFEST_FILENAME), core)
+
   invisible(list(n_views = length(views), n_events = nrow(events_df)))
 }
 
