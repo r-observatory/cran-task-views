@@ -11,4 +11,6 @@ test_that("the update workflow installs the SQLite deps and publishes to the cur
   expect_true(any(grepl("any::RSQLite", yml)))
   expect_true(any(grepl("gh release upload current", yml)))
   expect_true(any(grepl("Rscript scripts/update.R", yml)))
+  # The integrity manifest is attached to the release alongside the DB.
+  expect_true(any(grepl("out/manifest.json", yml)))
 })

@@ -58,4 +58,4 @@ jobs:
             gh release create current --title "CRAN Task Views (rolling)" \
               --notes "CRAN task-view membership over time, replayed from each view's git history." --latest
           fi
-          gh release upload current out/cran-task-views.db --clobber
+          gh release upload current out/cran-task-views.db out/manifest.json --clobber
