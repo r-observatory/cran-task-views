@@ -1,6 +1,8 @@
 library(testthat)
 source(file.path(getwd(), "scripts", "helpers.R"))
 source(file.path(getwd(), "scripts", "ctv_md.R"))
+source(file.path(getwd(), "scripts", "ctv_xml.R"))
+source(file.path(getwd(), "scripts", "svn_era.R"))
 source(file.path(getwd(), "scripts", "config.R"))
 source(file.path(getwd(), "scripts", "update.R"))
 test_dir("tests/testthat", stop_on_failure = TRUE)
