@@ -110,7 +110,8 @@ export_task_views <- function(path, views_df, events_df, membership_df) {
       topic      TEXT,
       maintainer TEXT,
       url        TEXT,
-      updated    TEXT
+      updated    TEXT,
+      retired    TEXT
     )")
   RSQLite::dbExecute(con, "
     CREATE TABLE cran_task_view_events (

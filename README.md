@@ -16,15 +16,29 @@ dependency-light: it uses `git` and `gh` plus base-R string parsing, with no
 database and published to the `r-observatory/cran-task-views` GitHub
 repository for downstream consumers.
 
+The record goes back to 2005. Before the task views moved to GitHub in 2021
+and 2022, each view was a `.ctv` XML file in the ctv project's SVN repository on
+R-Forge, with its packages in a `<packagelist>` block. R-Forge is being
+retired, so that history is kept as a git bundle on the `rforge-svn-archive`
+release of this repository. `scripts/svn_era.R` extracted it once into
+`data/svn-era-events.tsv` and `data/svn-era-views.tsv`, which every run reads.
+Each view's XML history runs up to its first GitHub commit, and the GitHub
+history continues from the list the XML history ends with. Old names are folded
+into the current ones (for example, `gR` into `GraphicalModels`). Views that
+never moved to GitHub (Genetics, Graphics, Multivariate, SocialSciences) are
+kept as retired views, and their final XML files are in `data/retired-views/`.
+
 ## Output
 
 `cran-task-views.db` (published on the rolling `current` release) contains:
 
 - `cran_task_views` - one row per task view: `name`, `topic`, `maintainer`,
-  `url`, `updated`.
+  `url`, `updated`, `retired` (the date a retired view left CRAN, empty for a
+  current view).
 - `cran_task_view_events` - the append-only membership event log: `view`,
   `package`, `event_type` (`added`, `removed`, `core_change`), `event_date`,
-  `core`, `source`.
+  `core`, `source` (`svn` for the R-Forge years, `git` for GitHub, and
+  `retired` for the packages of a retired view, removed on its retirement day).
 - `cran_task_view_membership` - current membership derived from the event
   log: `view`, `package`, `added_date`, `removed_date`, `currently_member`,
   `core`.
@@ -39,4 +53,5 @@ CRAN.
 Rscript scripts/update.R out/            # full rebuild, replays all revisions
 Rscript scripts/update.R out/ --bootstrap  # full rebuild
 Rscript tests/testthat.R                 # unit tests
+Rscript scripts/svn_era.R extract ctv-rforge-svn-history.bundle   # rebuild data/ from the archive
 ```

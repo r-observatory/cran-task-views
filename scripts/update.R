@@ -22,6 +22,12 @@ if (!exists("export_task_views", mode = "function")) {
 if (!exists("parse_ctv_membership", mode = "function")) {
   source(file.path(.script_dir, "ctv_md.R"))
 }
+if (!exists("parse_ctv_xml_membership", mode = "function")) {
+  source(file.path(.script_dir, "ctv_xml.R"))
+}
+if (!exists("svn_snapshot", mode = "function")) {
+  source(file.path(.script_dir, "svn_era.R"))
+}
 
 run_update <- function(io, out_dir, force_full = FALSE) {
   dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
@@ -31,10 +37,25 @@ run_update <- function(io, out_dir, force_full = FALSE) {
                  length(views), VIEWS_FLOOR))
   }
 
+  # The R-Forge era (scripts/svn_era.R): NULL when an io has none, as in tests.
+  svn <- if (is.function(io$svn_era)) io$svn_era() else NULL
+
   all_events <- list(); meta_rows <- list()
   for (v in views) {
     revs <- io$view_repo_revisions(v)              # oldest-first data.frame(sha, date)
     prev_snap <- integer(0)
+    # The eras meet at the view's first GitHub commit: XML events from before it
+    # are kept, and the GitHub walk starts from the list they add up to, so only
+    # real differences show at the join.
+    if (!is.null(svn)) {
+      cut <- if (!is.null(revs) && nrow(revs) > 0L) revs$date[1] else NA_character_
+      xev <- svn$events[svn$events$view == v &
+                          (is.na(cut) | svn$events$event_date < cut), , drop = FALSE]
+      if (nrow(xev) > 0L) {
+        all_events[[length(all_events) + 1L]] <- xev
+        prev_snap <- svn_snapshot(xev)
+      }
+    }
     if (!is.null(revs) && nrow(revs) > 0L) for (r in seq_len(nrow(revs))) {
       snap <- io$read_ctv_at(v, revs$sha[r])       # named int vector package -> core
       ev <- diff_membership(setNames(list(prev_snap), v),
@@ -46,7 +67,22 @@ run_update <- function(io, out_dir, force_full = FALSE) {
     meta_rows[[length(meta_rows) + 1L]] <- data.frame(name = v,
       topic = info$topic %||% v, maintainer = info$maintainer %||% NA_character_,
       url = info$url %||% NA_character_, updated = info$updated %||% NA_character_,
-      stringsAsFactors = FALSE)
+      retired = NA_character_, stringsAsFactors = FALSE)
+  }
+
+  # Retired views never reached GitHub; the list is fixed in the era files, so a
+  # view missing from a short listing above is skipped, never retired.
+  if (!is.null(svn)) {
+    gone <- svn$views[!is.na(svn$views$retired) & !(svn$views$name %in% views), , drop = FALSE]
+    for (i in seq_len(nrow(gone))) {
+      g <- gone[i, ]
+      xev <- svn$events[svn$events$view == g$name, , drop = FALSE]
+      all_events[[length(all_events) + 1L]] <- xev
+      all_events[[length(all_events) + 1L]] <- svn_retirement_events(g$name, svn_snapshot(xev), g$retired)
+      meta_rows[[length(meta_rows) + 1L]] <- data.frame(name = g$name,
+        topic = g$topic %||% g$name, maintainer = g$maintainer, url = sprintf(RETIRED_URL, g$name),
+        updated = g$updated, retired = g$retired, stringsAsFactors = FALSE)
+    }
   }
 
   events_df <- if (length(all_events)) do.call(rbind, all_events)
@@ -54,7 +90,8 @@ run_update <- function(io, out_dir, force_full = FALSE) {
   membership_df <- derive_membership_from_events(events_df)
   views_df <- if (length(meta_rows)) do.call(rbind, meta_rows) else
     data.frame(name=character(0), topic=character(0), maintainer=character(0),
-               url=character(0), updated=character(0), stringsAsFactors = FALSE)
+               url=character(0), updated=character(0), retired=character(0),
+               stringsAsFactors = FALSE)
 
   db_path <- file.path(out_dir, DB_FILENAME)
   export_task_views(db_path, views_df, events_df, membership_df)
@@ -169,6 +206,16 @@ default_io <- function() {
                     updated = NA_character_))
       }
       parse_ctv_header(paste(txt, collapse = "\n"), view = v)
+    },
+    # The committed R-Forge era (scripts/svn_era.R). Missing files mean a broken
+    # checkout; publishing without them would drop sixteen years of history.
+    svn_era = function() {
+      dir <- file.path(dirname(.script_dir), "data")
+      if (!file.exists(file.path(dir, "svn-era-events.tsv")) ||
+          !file.exists(file.path(dir, "svn-era-views.tsv"))) {
+        stop("data/svn-era-events.tsv or data/svn-era-views.tsv is missing")
+      }
+      read_svn_era(dir)
     }
   )
 }
