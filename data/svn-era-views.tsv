@@ -1,42 +1,42 @@
-name	topic	maintainer	updated	last_path	last_sha	deleted	retired
-Bayesian	Bayesian Inference	Jong Hee Park	2022-03-08	pkg/inst/ctv/Bayesian.ctv	e0ce03feaa87ccf75a5e5f7bd86238e49b4ebbb8		
-ChemPhys	Chemometrics and Computational Physics	Katharine Mullen	2022-03-21	pkg/inst/ctv/ChemPhys.ctv	e4bab9bc980a649625ba1286d03c1e984c5bd3ee		
-ClinicalTrials	Clinical Trial Design, Monitoring, and Analysis	H.G. Zhang, Ed Zhang	2021-06-20	pkg/inst/ctv/ClinicalTrials.ctv	75714c113d6f1332aaec7de7977107d7a64759b6		
-Cluster	Cluster Analysis & Finite Mixture Models	Friedrich Leisch, Bettina Gruen	2022-03-08	pkg/inst/ctv/Cluster.ctv	e0ce03feaa87ccf75a5e5f7bd86238e49b4ebbb8		
-Databases	Databases with R	Yuan Tang	2022-02-05	pkg/inst/ctv/Databases.ctv	9aca3a0c0b0fe9aef1f717a9a1b219080af96320		
-DifferentialEquations	Differential Equations	Karline Soetaert, Thomas Petzoldt	2021-09-22	pkg/inst/ctv/DifferentialEquations.ctv	94dd69a88982b3fad7d0d1f2460ee4b604704b4f		
-Distributions	Probability Distributions	Christophe Dutang, Patrice Kiener	2022-03-22	pkg/inst/ctv/Distributions.ctv	dd82bacfee5f4eb5f53eabcfbb18aa88f36fb872		
-Econometrics	Econometrics	Achim Zeileis, Grant McDermott	2022-01-20	pkg/inst/ctv/Econometrics.ctv	4a54a652aab7d84f18042fa8a0f8770989936c0b		
-Environmetrics	Analysis of Ecological and Environmental Data	Gavin Simpson	2022-01-07	pkg/inst/ctv/Environmetrics.ctv	7d888fef7d866df93a1f95380321e4333f9aba7c		
-ExperimentalDesign	Design of Experiments (DoE) & Analysis of Experimental Data	Ulrike Groemping	2022-03-08	pkg/inst/ctv/ExperimentalDesign.ctv	e0ce03feaa87ccf75a5e5f7bd86238e49b4ebbb8		
-ExtremeValue	Extreme Value Analysis	Christophe Dutang, Kevin Jaunatre	2020-02-20	pkg/inst/ctv/ExtremeValue.ctv	286a3850d9aaa80446a75975cb7b6e31f43c7492		
-Finance	Empirical Finance	Dirk Eddelbuettel	2022-03-23	pkg/inst/ctv/Finance.ctv	a9f5df021f5b3f53b8a2f74a318491ca693b3275		
-FunctionalData	Functional Data Analysis	Fabian Scheipl	2022-03-21	pkg/inst/ctv/FunctionalData.ctv	e4bab9bc980a649625ba1286d03c1e984c5bd3ee		
-Genetics	Statistical Genetics	Giovanni Montana	2021-11-09	pkg/inst/ctv/Genetics.ctv	2928896e87bd6bf8f266227ca716ce2cdc165792		2022-04-03
-GraphicalModels	Graphical Models	Soren Hojsgaard	2022-03-23	pkg/inst/ctv/GraphicalModels.ctv	a9f5df021f5b3f53b8a2f74a318491ca693b3275		
-Graphics	Graphic Displays & Dynamic Graphics & Graphic Devices & Visualization	Nicholas Lewin-Koh	2015-01-07	pkg/inst/ctv/Graphics.ctv	cca54fd0a78419f0b38bb806136ef8788b9c5a01	2021-12-16	2021-12-16
-HighPerformanceComputing	High-Performance and Parallel Computing with R	Dirk Eddelbuettel	2022-03-22	pkg/inst/ctv/HighPerformanceComputing.ctv	dd82bacfee5f4eb5f53eabcfbb18aa88f36fb872		
-Hydrology	Hydrological Data and Modeling	Sam Albers, Sam Zipper, Ilaria Prosdocimi	2022-03-02	pkg/inst/ctv/Hydrology.ctv	399e481ea0279163c5d21c1175c41a95b73412c8		
-MachineLearning	Machine Learning & Statistical Learning	Torsten Hothorn	2022-03-21	pkg/inst/ctv/MachineLearning.ctv	e4bab9bc980a649625ba1286d03c1e984c5bd3ee		
-MedicalImaging	Medical Image Analysis	Brandon Whitcher	2022-03-19	pkg/inst/ctv/MedicalImaging.ctv	d78f6017fabea8a04f1e44eda46898592d0d45fd		
-MetaAnalysis	Meta-Analysis	Michael Dewey	2022-03-07	pkg/inst/ctv/MetaAnalysis.ctv	fc377b5a53d459691f483df34d7c67ee3f30aa37		
-MissingData	Missing Data	Julie Josse, Nicholas Tierney, Nathalie Vialaneix (r-miss-tastic team)	2022-03-07	pkg/inst/ctv/MissingData.ctv	fc377b5a53d459691f483df34d7c67ee3f30aa37		
-ModelDeployment	Model Deployment with R	Yuan Tang	2022-03-07	pkg/inst/ctv/ModelDeployment.ctv	fc377b5a53d459691f483df34d7c67ee3f30aa37		
-Multivariate	Multivariate Statistics	Paul Hewson	2021-11-19	pkg/inst/ctv/Multivariate.ctv	50be0ac294188303503023394c24be1a2055ff11	2022-03-06	2022-03-06
-NaturalLanguageProcessing	Natural Language Processing	Fridolin Wild, Performance Augmentation Lab (PAL), Oxford Brookes University, UK	2021-10-20	pkg/inst/ctv/NaturalLanguageProcessing.ctv	bf730237bfb27994a930788ed67659bda3bd4cea		
-NumericalMathematics	Numerical Mathematics	Hans W. Borchers	2021-12-15	pkg/inst/ctv/NumericalMathematics.ctv	8f25eb85ba1a643225bdc4445f92e5fcf2de13b5		
-OfficialStatistics	Official Statistics & Survey Statistics	Matthias Templ	2022-02-10	pkg/inst/ctv/OfficialStatistics.ctv	e563afe76ded6e060508fffb8d76786eb3e0f984		
-Optimization	Optimization and Mathematical Programming	Stefan Theussl, Florian Schwendinger, Hans W. Borchers	2022-03-07	pkg/inst/ctv/Optimization.ctv	fc377b5a53d459691f483df34d7c67ee3f30aa37		
-Pharmacokinetics	Analysis of Pharmacokinetic Data	Bill Denney	2021-05-27	pkg/inst/ctv/Pharmacokinetics.ctv	8d8f2a50a2764e2291e885ec831ba29671aebec5		
-Phylogenetics	Phylogenetics, Especially Comparative Methods	Brian O'Meara	2022-03-21	pkg/inst/ctv/Phylogenetics.ctv	e4bab9bc980a649625ba1286d03c1e984c5bd3ee		
-Psychometrics	Psychometric Models and Methods	Patrick Mair	2022-03-16	pkg/inst/ctv/Psychometrics.ctv	496ebeb5736ed9633f10111361359ac198a1df70		
-ReproducibleResearch	Reproducible Research	John Blischak, Alison Hill	2022-03-17	pkg/inst/ctv/ReproducibleResearch.ctv	496ebeb5736ed9633f10111361359ac198a1df70		
-Robust	Robust Statistical Methods	Martin Maechler	2021-11-23	pkg/inst/ctv/Robust.ctv	87657622790dc3aa23546fa94941bffae696cbc8		
-SocialSciences	Statistics for the Social Sciences	John Fox	2022-02-20	pkg/inst/ctv/SocialSciences.ctv	0b27daf8006eea0a2da54c5333403d26860989d6	2022-03-06	2022-03-06
-Spatial	Analysis of Spatial Data	Roger Bivand	2022-04-03	pkg/inst/ctv/Spatial.ctv	2f3e495cab655a8fd775a8c9eb1b90873314fbe6		
-SpatioTemporal	Handling and Analyzing Spatio-Temporal Data	Edzer Pebesma	2022-03-18	pkg/inst/ctv/SpatioTemporal.ctv	39d3089aa275c3c8a756d79115f120cd07cfe2ca		
-Survival	Survival Analysis	Arthur Allignol and Aurelien Latouche	2022-03-07	pkg/inst/ctv/Survival.ctv	fc377b5a53d459691f483df34d7c67ee3f30aa37		
-TeachingStatistics	Teaching Statistics	Paul Northrop	2021-07-30	pkg/inst/ctv/TeachingStatistics.ctv	349311d73e1f5e59841b05cd356a9b53340d7850		
-TimeSeries	Time Series Analysis	Rob J Hyndman	2022-04-01	pkg/inst/ctv/TimeSeries.ctv	f6f887e643751bbff08873cddb8ad6905cfcee0e		
-Tracking	Processing and Analysis of Tracking Data	Rocío Joo, Matthew E. Boone, Michael Sumner and Mathieu Basille	2021-11-15	pkg/inst/ctv/Tracking.ctv	406bbcad995ef7002fa7337fe23e2d96be7db8ef		
-WebTechnologies	Web Technologies and Services	Scott Chamberlain, Thomas Leeper, Patrick Mair, Karthik Ram, Christopher Gandrud	2022-03-08	pkg/inst/ctv/WebTechnologies.ctv	e0ce03feaa87ccf75a5e5f7bd86238e49b4ebbb8		
+name	topic	maintainer	updated	last_path	last_sha	last_date	deleted	retired
+Bayesian	Bayesian Inference	Jong Hee Park	2022-03-08	pkg/inst/ctv/Bayesian.ctv	e0ce03feaa87ccf75a5e5f7bd86238e49b4ebbb8	2022-03-08		
+ChemPhys	Chemometrics and Computational Physics	Katharine Mullen	2022-03-21	pkg/inst/ctv/ChemPhys.ctv	e4bab9bc980a649625ba1286d03c1e984c5bd3ee	2022-03-21		
+ClinicalTrials	Clinical Trial Design, Monitoring, and Analysis	H.G. Zhang, Ed Zhang	2021-06-20	pkg/inst/ctv/ClinicalTrials.ctv	75714c113d6f1332aaec7de7977107d7a64759b6	2021-06-20		
+Cluster	Cluster Analysis & Finite Mixture Models	Friedrich Leisch, Bettina Gruen	2022-03-08	pkg/inst/ctv/Cluster.ctv	e0ce03feaa87ccf75a5e5f7bd86238e49b4ebbb8	2022-03-08		
+Databases	Databases with R	Yuan Tang	2022-02-05	pkg/inst/ctv/Databases.ctv	9aca3a0c0b0fe9aef1f717a9a1b219080af96320	2022-02-05		
+DifferentialEquations	Differential Equations	Karline Soetaert, Thomas Petzoldt	2021-09-22	pkg/inst/ctv/DifferentialEquations.ctv	94dd69a88982b3fad7d0d1f2460ee4b604704b4f	2021-09-22		
+Distributions	Probability Distributions	Christophe Dutang, Patrice Kiener	2022-03-22	pkg/inst/ctv/Distributions.ctv	dd82bacfee5f4eb5f53eabcfbb18aa88f36fb872	2022-03-22		
+Econometrics	Econometrics	Achim Zeileis, Grant McDermott	2022-01-20	pkg/inst/ctv/Econometrics.ctv	4a54a652aab7d84f18042fa8a0f8770989936c0b	2022-01-20		
+Environmetrics	Analysis of Ecological and Environmental Data	Gavin Simpson	2022-01-07	pkg/inst/ctv/Environmetrics.ctv	7d888fef7d866df93a1f95380321e4333f9aba7c	2022-01-07		
+ExperimentalDesign	Design of Experiments (DoE) & Analysis of Experimental Data	Ulrike Groemping	2022-03-08	pkg/inst/ctv/ExperimentalDesign.ctv	e0ce03feaa87ccf75a5e5f7bd86238e49b4ebbb8	2022-03-08		
+ExtremeValue	Extreme Value Analysis	Christophe Dutang, Kevin Jaunatre	2020-02-20	pkg/inst/ctv/ExtremeValue.ctv	286a3850d9aaa80446a75975cb7b6e31f43c7492	2020-02-20		
+Finance	Empirical Finance	Dirk Eddelbuettel	2022-03-23	pkg/inst/ctv/Finance.ctv	a9f5df021f5b3f53b8a2f74a318491ca693b3275	2022-03-23		
+FunctionalData	Functional Data Analysis	Fabian Scheipl	2022-03-21	pkg/inst/ctv/FunctionalData.ctv	e4bab9bc980a649625ba1286d03c1e984c5bd3ee	2022-03-21		
+Genetics	Statistical Genetics	Giovanni Montana	2021-11-09	pkg/inst/ctv/Genetics.ctv	2928896e87bd6bf8f266227ca716ce2cdc165792	2021-11-09		2022-04-03
+GraphicalModels	Graphical Models	Soren Hojsgaard	2022-03-23	pkg/inst/ctv/GraphicalModels.ctv	a9f5df021f5b3f53b8a2f74a318491ca693b3275	2022-03-23		
+Graphics	Graphic Displays & Dynamic Graphics & Graphic Devices & Visualization	Nicholas Lewin-Koh	2015-01-07	pkg/inst/ctv/Graphics.ctv	cca54fd0a78419f0b38bb806136ef8788b9c5a01	2021-08-21	2021-12-16	2021-12-16
+HighPerformanceComputing	High-Performance and Parallel Computing with R	Dirk Eddelbuettel	2022-03-22	pkg/inst/ctv/HighPerformanceComputing.ctv	dd82bacfee5f4eb5f53eabcfbb18aa88f36fb872	2022-03-22		
+Hydrology	Hydrological Data and Modeling	Sam Albers, Sam Zipper, Ilaria Prosdocimi	2022-03-02	pkg/inst/ctv/Hydrology.ctv	399e481ea0279163c5d21c1175c41a95b73412c8	2022-03-01		
+MachineLearning	Machine Learning & Statistical Learning	Torsten Hothorn	2022-03-21	pkg/inst/ctv/MachineLearning.ctv	e4bab9bc980a649625ba1286d03c1e984c5bd3ee	2022-03-21		
+MedicalImaging	Medical Image Analysis	Brandon Whitcher	2022-03-19	pkg/inst/ctv/MedicalImaging.ctv	d78f6017fabea8a04f1e44eda46898592d0d45fd	2022-03-19		
+MetaAnalysis	Meta-Analysis	Michael Dewey	2022-03-07	pkg/inst/ctv/MetaAnalysis.ctv	fc377b5a53d459691f483df34d7c67ee3f30aa37	2022-03-07		
+MissingData	Missing Data	Julie Josse, Nicholas Tierney, Nathalie Vialaneix (r-miss-tastic team)	2022-03-07	pkg/inst/ctv/MissingData.ctv	fc377b5a53d459691f483df34d7c67ee3f30aa37	2022-03-07		
+ModelDeployment	Model Deployment with R	Yuan Tang	2022-03-07	pkg/inst/ctv/ModelDeployment.ctv	fc377b5a53d459691f483df34d7c67ee3f30aa37	2022-03-07		
+Multivariate	Multivariate Statistics	Paul Hewson	2021-11-19	pkg/inst/ctv/Multivariate.ctv	50be0ac294188303503023394c24be1a2055ff11	2021-11-19	2022-03-06	2022-03-06
+NaturalLanguageProcessing	Natural Language Processing	Fridolin Wild, Performance Augmentation Lab (PAL), Oxford Brookes University, UK	2021-10-20	pkg/inst/ctv/NaturalLanguageProcessing.ctv	bf730237bfb27994a930788ed67659bda3bd4cea	2021-10-20		
+NumericalMathematics	Numerical Mathematics	Hans W. Borchers	2021-12-15	pkg/inst/ctv/NumericalMathematics.ctv	8f25eb85ba1a643225bdc4445f92e5fcf2de13b5	2021-12-16		
+OfficialStatistics	Official Statistics & Survey Statistics	Matthias Templ	2022-02-10	pkg/inst/ctv/OfficialStatistics.ctv	e563afe76ded6e060508fffb8d76786eb3e0f984	2022-02-10		
+Optimization	Optimization and Mathematical Programming	Stefan Theussl, Florian Schwendinger, Hans W. Borchers	2022-03-07	pkg/inst/ctv/Optimization.ctv	fc377b5a53d459691f483df34d7c67ee3f30aa37	2022-03-07		
+Pharmacokinetics	Analysis of Pharmacokinetic Data	Bill Denney	2021-05-27	pkg/inst/ctv/Pharmacokinetics.ctv	8d8f2a50a2764e2291e885ec831ba29671aebec5	2021-05-27		
+Phylogenetics	Phylogenetics, Especially Comparative Methods	Brian O'Meara	2022-03-21	pkg/inst/ctv/Phylogenetics.ctv	e4bab9bc980a649625ba1286d03c1e984c5bd3ee	2022-03-21		
+Psychometrics	Psychometric Models and Methods	Patrick Mair	2022-03-16	pkg/inst/ctv/Psychometrics.ctv	496ebeb5736ed9633f10111361359ac198a1df70	2022-03-16		
+ReproducibleResearch	Reproducible Research	John Blischak, Alison Hill	2022-03-17	pkg/inst/ctv/ReproducibleResearch.ctv	496ebeb5736ed9633f10111361359ac198a1df70	2022-03-16		
+Robust	Robust Statistical Methods	Martin Maechler	2021-11-23	pkg/inst/ctv/Robust.ctv	87657622790dc3aa23546fa94941bffae696cbc8	2021-11-23		
+SocialSciences	Statistics for the Social Sciences	John Fox	2022-02-20	pkg/inst/ctv/SocialSciences.ctv	0b27daf8006eea0a2da54c5333403d26860989d6	2022-02-20	2022-03-06	2022-03-06
+Spatial	Analysis of Spatial Data	Roger Bivand	2022-04-03	pkg/inst/ctv/Spatial.ctv	2f3e495cab655a8fd775a8c9eb1b90873314fbe6	2022-04-03		
+SpatioTemporal	Handling and Analyzing Spatio-Temporal Data	Edzer Pebesma	2022-03-18	pkg/inst/ctv/SpatioTemporal.ctv	39d3089aa275c3c8a756d79115f120cd07cfe2ca	2022-03-18		
+Survival	Survival Analysis	Arthur Allignol and Aurelien Latouche	2022-03-07	pkg/inst/ctv/Survival.ctv	fc377b5a53d459691f483df34d7c67ee3f30aa37	2022-03-07		
+TeachingStatistics	Teaching Statistics	Paul Northrop	2021-07-30	pkg/inst/ctv/TeachingStatistics.ctv	349311d73e1f5e59841b05cd356a9b53340d7850	2021-07-30		
+TimeSeries	Time Series Analysis	Rob J Hyndman	2022-04-01	pkg/inst/ctv/TimeSeries.ctv	f6f887e643751bbff08873cddb8ad6905cfcee0e	2022-04-01		
+Tracking	Processing and Analysis of Tracking Data	Rocío Joo, Matthew E. Boone, Michael Sumner and Mathieu Basille	2021-11-15	pkg/inst/ctv/Tracking.ctv	406bbcad995ef7002fa7337fe23e2d96be7db8ef	2021-11-15		
+WebTechnologies	Web Technologies and Services	Scott Chamberlain, Thomas Leeper, Patrick Mair, Karthik Ram, Christopher Gandrud	2022-03-08	pkg/inst/ctv/WebTechnologies.ctv	e0ce03feaa87ccf75a5e5f7bd86238e49b4ebbb8	2022-03-08		

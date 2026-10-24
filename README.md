@@ -22,8 +22,11 @@ R-Forge, with its packages in a `<packagelist>` block. R-Forge is being
 retired, so that history is kept as a git bundle on the `rforge-svn-archive`
 release of this repository. `scripts/svn_era.R` extracted it once into
 `data/svn-era-events.tsv` and `data/svn-era-views.tsv`, which every run reads.
-Each view's XML history runs up to its first GitHub commit, and the GitHub
-history continues from the list the XML history ends with. Old names are folded
+CRAN published from the XML until the move was done, while some GitHub copies
+were still half converted. So each view's XML history runs to its last XML
+edit, and its GitHub history takes over after that day, starting from the list
+the XML ended with. Each day is read once, at its last commit, so an edit and
+its revert on the same day leave no trace. Old names are folded
 into the current ones (for example, `gR` into `GraphicalModels`). Views that
 never moved to GitHub (Genetics, Graphics, Multivariate, SocialSciences) are
 kept as retired views, and their final XML files are in `data/retired-views/`.

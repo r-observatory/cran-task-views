@@ -8,7 +8,7 @@
 #
 #   svn-era-events.tsv  view, package, event_type, event_date, core, source="svn"
 #   svn-era-views.tsv   one row per view seen in that era, with its last header,
-#                       last path and sha, the date its file was deleted, and
+#                       last path, sha and edit date, the date its file was deleted, and
 #                       `retired` for views that never reached GitHub
 #
 # update.R reads those files on every run. Run the extraction with
@@ -26,7 +26,7 @@ SVN_ERA_END <- "2022-04-03"
 SVN_PATH_ORDER <- c("^pkg/inst/ctv/", "^inst/ctv/", "^pkg/inst/", "^[^/]+$")
 SVN_EVENT_COLS <- c("view", "package", "event_type", "event_date", "core", "source")
 SVN_VIEW_COLS  <- c("name", "topic", "maintainer", "updated", "last_path", "last_sha",
-                    "deleted", "retired")
+                    "last_date", "deleted", "retired")
 RETIRED_URL <- "https://github.com/r-observatory/cran-task-views/blob/main/data/retired-views/%s.ctv"
 
 svn_view_name <- function(basename) {
@@ -83,7 +83,8 @@ svn_replay <- function(commits, read_tree, read_blob) {
       h <- parse_ctv_xml_header(txt)
       snap[[v]] <- s; blob[[v]] <- b; present[[v]] <- TRUE
       info[[v]] <- list(topic = h$topic, maintainer = h$maintainer, updated = h$updated,
-                        last_path = paths[[v]], last_sha = sha, deleted = NA_character_)
+                        last_path = paths[[v]], last_sha = sha, last_date = date,
+                        deleted = NA_character_)
     }
     for (v in setdiff(names(present)[unlist(present)], names(paths))) {
       present[[v]] <- FALSE
@@ -94,7 +95,8 @@ svn_replay <- function(commits, read_tree, read_blob) {
   views <- do.call(rbind, lapply(sort(names(info)), function(v) data.frame(
     name = v, topic = info[[v]]$topic, maintainer = info[[v]]$maintainer,
     updated = info[[v]]$updated, last_path = info[[v]]$last_path,
-    last_sha = info[[v]]$last_sha, deleted = info[[v]]$deleted, stringsAsFactors = FALSE)))
+    last_sha = info[[v]]$last_sha, last_date = info[[v]]$last_date,
+    deleted = info[[v]]$deleted, stringsAsFactors = FALSE)))
   rownames(ev_df) <- NULL
   list(events = ev_df[SVN_EVENT_COLS], views = views)
 }

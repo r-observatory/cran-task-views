@@ -54,6 +54,7 @@ test_that("replay emits additions on first sight and real changes after, but not
   expect_equal(ev$core[ev$package == "ggm"], 1L)
   v <- r$views[r$views$name == "GraphicalModels", ]
   expect_equal(v$last_path, "pkg/inst/ctv/GraphicalModels.ctv")
+  expect_equal(v$last_date, "2010-01-01")   # the last edit to the list, not the rename
   expect_true(is.na(v$deleted))
 })
 
@@ -96,7 +97,7 @@ test_that("the era files survive a write and a read unchanged", {
                    event_date = "2005-05-20", core = 1L, source = "svn", stringsAsFactors = FALSE)
   views <- data.frame(name = "Graphics", topic = "Graphic Displays & Dynamic Graphics",
                       maintainer = "Nicholas Lewin-Koh", updated = NA_character_,
-                      last_path = "pkg/inst/ctv/Graphics.ctv", last_sha = "abc",
+                      last_path = "pkg/inst/ctv/Graphics.ctv", last_sha = "abc", last_date = "2015-01-07",
                       deleted = "2021-12-16", retired = "2021-12-16", stringsAsFactors = FALSE)
   write_svn_era(list(events = ev, views = views), dir)
   back <- read_svn_era(dir)
@@ -104,7 +105,7 @@ test_that("the era files survive a write and a read unchanged", {
   expect_equal(back$views, views)
 })
 
-test_that("run_update joins the eras at each view's first GitHub commit and keeps retired views", {
+test_that("run_update keeps the XML history to its last edit, then GitHub, and keeps retired views", {
   svn <- list(
     events = data.frame(
       view = c("Spatial", "Spatial", "Spatial", "Graphics", "Graphics"),
@@ -115,16 +116,17 @@ test_that("run_update joins the eras at each view's first GitHub commit and keep
     views = data.frame(name = c("Spatial", "Graphics"), topic = c("Spatial", "Graphics"),
       maintainer = c("R. Bivand", "N. Lewin-Koh"), updated = c("2022-03-01", "2021-11-01"),
       last_path = c("pkg/inst/ctv/Spatial.ctv", "pkg/inst/ctv/Graphics.ctv"),
-      last_sha = c("s1", "g1"), deleted = c(NA, "2021-12-16"),
-      retired = c(NA, "2021-12-16"), stringsAsFactors = FALSE))
+      last_sha = c("s1", "g1"), last_date = c("2022-03-01", "2021-11-01"),
+      deleted = c(NA, "2021-12-16"), retired = c(NA, "2021-12-16"), stringsAsFactors = FALSE))
   fake_io <- list(
     available_views = function() c("Spatial"),
     view_repo_revisions = function(v) data.frame(sha = c("m1", "m2"),
       date = c("2021-12-28", "2022-06-01"), stringsAsFactors = FALSE),
-    # m1 is the converted list (sp, maptools, as the XML had before the cutover);
-    # sf only arrives on GitHub at m2. The XML sf of 2022-03-01 is after the cutover.
-    read_ctv_at = function(v, sha) if (sha == "m1") c(maptools = 0L, sp = 1L)
-                                  else c(maptools = 0L, sf = 0L, sp = 1L),
+    # m1 is a half-converted GitHub copy that lists nothing, made while the XML
+    # was still edited (sf joined there on 2022-03-01); it must leave no trace.
+    # m2, after the XML's last edit, carries the list on and adds terra.
+    read_ctv_at = function(v, sha) if (sha == "m1") integer(0)
+                                  else c(maptools = 0L, sf = 0L, sp = 1L, terra = 0L),
     view_info = function(v) list(topic = "Spatial Data", maintainer = "R. Bivand",
       url = "https://github.com/cran-task-views/Spatial/", updated = "2022-06-01"),
     svn_era = function() svn)
@@ -136,11 +138,12 @@ test_that("run_update joins the eras at each view's first GitHub commit and keep
 
   sp <- RSQLite::dbGetQuery(con, "SELECT package, event_type, event_date, source
     FROM cran_task_view_events WHERE view = 'Spatial' ORDER BY event_date, package")
-  expect_equal(paste(sp$package, sp$event_date, sp$source),
-               c("maptools 2005-05-20 svn", "sp 2005-05-20 svn", "sf 2022-06-01 git"))
+  expect_equal(paste(sp$package, sp$event_type, sp$event_date, sp$source),
+               c("maptools added 2005-05-20 svn", "sp added 2005-05-20 svn",
+                 "sf added 2022-03-01 svn", "terra added 2022-06-01 git"))
   mem <- RSQLite::dbGetQuery(con, "SELECT package, added_date FROM cran_task_view_membership
     WHERE view = 'Spatial' ORDER BY package")
-  expect_equal(mem$added_date, c("2005-05-20", "2022-06-01", "2005-05-20"))
+  expect_equal(mem$added_date, c("2005-05-20", "2022-03-01", "2005-05-20", "2022-06-01"))
 
   v <- RSQLite::dbGetQuery(con, "SELECT name, retired, url FROM cran_task_views ORDER BY name")
   expect_equal(v$name, c("Graphics", "Spatial"))
@@ -157,12 +160,41 @@ test_that("run_update joins the eras at each view's first GitHub commit and keep
   expect_true(all(gm$removed_date == "2021-12-16"))
 })
 
+test_that("GitHub commits on one day count once, as the file stood at the end of the day", {
+  # WebTechnologies on 2022-01-16: a converted list, then a merge that brought
+  # back an older file with no pkg() links at all.
+  fake_io <- list(
+    available_views = function() c("WebTechnologies"),
+    view_repo_revisions = function(v) data.frame(sha = c("a", "b", "c"),
+      date = c("2022-01-10", "2022-01-16", "2022-01-16"), stringsAsFactors = FALSE),
+    read_ctv_at = function(v, sha) switch(sha, a = c(httr = 1L), b = integer(0),
+                                          c = c(httr = 1L, curl = 0L)),
+    view_info = function(v) list(topic = "Web", maintainer = "M", url = NA, updated = NA))
+  out <- tempfile(); dir.create(out)
+  on.exit(unlink(out, recursive = TRUE), add = TRUE)
+  run_update(fake_io, out, force_full = TRUE)
+  con <- RSQLite::dbConnect(RSQLite::SQLite(), file.path(out, "cran-task-views.db"))
+  on.exit(RSQLite::dbDisconnect(con), add = TRUE)
+  ev <- RSQLite::dbGetQuery(con, "SELECT package, event_type, event_date FROM cran_task_view_events
+    ORDER BY event_date, package")
+  expect_equal(paste(ev$package, ev$event_type, ev$event_date),
+               c("httr added 2022-01-10", "curl added 2022-01-16"))
+})
+
+test_that("a .md file that still holds the old XML is read as XML", {
+  xml <- '<CRANTaskView><name>Databases</name><packagelist><pkg>DBI</pkg><pkg priority="core">RSQLite</pkg></packagelist></CRANTaskView>'
+  expect_equal(parse_view_membership(xml), c(DBI = 0L, RSQLite = 1L))
+  md <- "---\nname: Databases\n---\n\nSee `r pkg(\"DBI\")`."
+  expect_equal(parse_view_membership(md), c(DBI = 0L))
+})
+
 test_that("a view missing from a short GitHub listing is skipped, never retired", {
   svn <- list(
     events = data.frame(view = "Spatial", package = "sp", event_type = "added",
       event_date = "2005-05-20", core = 1L, source = "svn", stringsAsFactors = FALSE),
     views = data.frame(name = "Spatial", topic = "Spatial", maintainer = "R. Bivand",
       updated = NA_character_, last_path = "pkg/inst/ctv/Spatial.ctv", last_sha = "s1",
+      last_date = "2022-03-01",
       deleted = NA_character_, retired = NA_character_, stringsAsFactors = FALSE))
   fake_io <- list(available_views = function() character(0),
     view_repo_revisions = function(v) NULL, read_ctv_at = function(v, s) integer(0),

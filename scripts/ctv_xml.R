@@ -33,6 +33,16 @@ parse_ctv_xml_membership <- function(text) {
   out
 }
 
+#' Membership from a view file in either format.
+#'
+#' During the move to GitHub some `<View>.md` files held the old XML for a while
+#' (Databases was renamed before it was converted; Hydrology kept XML in its
+#' .md from 2019), so a <packagelist> block is read as XML.
+parse_view_membership <- function(text) {
+  if (grepl("<packagelist>", text, fixed = TRUE)) parse_ctv_xml_membership(text)
+  else parse_ctv_membership(text)
+}
+
 #' Parse the header of a `.ctv` XML source string.
 #'
 #' Returns list(topic, maintainer, updated); a missing field is NA_character_.

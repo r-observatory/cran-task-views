@@ -43,17 +43,25 @@ run_update <- function(io, out_dir, force_full = FALSE) {
   all_events <- list(); meta_rows <- list()
   for (v in views) {
     revs <- io$view_repo_revisions(v)              # oldest-first data.frame(sha, date)
+    # Events carry a day, so each day is read once, at its last commit: a broken
+    # merge fixed the same day leaves no trace.
+    if (!is.null(revs) && nrow(revs) > 0L) {
+      revs <- revs[!duplicated(revs$date, fromLast = TRUE), , drop = FALSE]
+    }
     prev_snap <- integer(0)
-    # The eras meet at the view's first GitHub commit: XML events from before it
-    # are kept, and the GitHub walk starts from the list they add up to, so only
-    # real differences show at the join.
+    # CRAN published from the XML until the move was done, while some GitHub
+    # copies were still half converted. So a view's XML history runs to its last
+    # XML edit, and its GitHub history takes over after that day, starting from
+    # the list the XML ended with.
     if (!is.null(svn)) {
-      cut <- if (!is.null(revs) && nrow(revs) > 0L) revs$date[1] else NA_character_
-      xev <- svn$events[svn$events$view == v &
-                          (is.na(cut) | svn$events$event_date < cut), , drop = FALSE]
+      xev <- svn$events[svn$events$view == v, , drop = FALSE]
+      cut <- svn$views$last_date[svn$views$name == v]
       if (nrow(xev) > 0L) {
         all_events[[length(all_events) + 1L]] <- xev
         prev_snap <- svn_snapshot(xev)
+      }
+      if (length(cut) == 1L && !is.na(cut) && !is.null(revs)) {
+        revs <- revs[revs$date > cut, , drop = FALSE]
       }
     }
     if (!is.null(revs) && nrow(revs) > 0L) for (r in seq_len(nrow(revs))) {
@@ -194,7 +202,7 @@ default_io <- function() {
       dest <- ensure_clone(v)
       txt <- git_show(dest, paste0(sha, ":", v, ".md"))
       if (length(txt) == 0L) return(integer(0))
-      parse_ctv_membership(paste(txt, collapse = "\n"))
+      parse_view_membership(paste(txt, collapse = "\n"))
     },
     # HEAD metadata parsed from the `<View>.md` YAML header.
     view_info = function(v) {
